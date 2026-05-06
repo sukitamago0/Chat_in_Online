@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="10 minutes">
+
+        <!-- 控制台输出 -->
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+                <encoder>
+                        <pattern>%d{yyyy-MM-dd HH:mm:ss, GMT+8} [%p][%c][%M][%L] -> %m%n</pattern>
+                </encoder>
+        </appender>
+
+        <!-- Spring 注入属性 -->
+        <springProperty scope="context" name="log.path" source="project.folder"/>
+        <springProperty scope="context" name="log.root.level" source="log.root.level"/>
+
+        <!-- 自定义属性 -->
+        <property name="LOG_FOLDER" value="logs"/>
+        <property name="LOG_FILE_NAME" value="easychat.log"/>
+
+        <!-- 文件日志 -->
+        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <file>${log.path}/${LOG_FOLDER}/${LOG_FILE_NAME}</file>
+                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                        <fileNamePattern>${log.path}/${LOG_FOLDER}/${LOG_FILE_NAME}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                        <cleanHistoryOnStart>true</cleanHistoryOnStart>
+                        <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                                <maxFileSize>20MB</maxFileSize>
+                        </timeBasedFileNamingAndTriggeringPolicy>
+                        <maxHistory>30</maxHistory>
+                </rollingPolicy>
+                <encoder>
+                        <charset>utf-8</charset>
+                        <pattern>%d{yyyy-MM-dd HH:mm:ss, GMT+8} [%p][%c][%M][%L] -> %m%n</pattern>
+                </encoder>
+                <append>false</append>
+        </appender>
+
+        <!-- 特定包日志级别 -->
+        <logger name="org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener" level="error"/>
+        <logger name="org.redisson.connection.DNSMonitor" level="error"/>
+        <logger name="com.zaxxer.hikari" level="info"/>
+        <logger name="io.lettuce.core" level="info"/>
+        <logger name="org.springframework.data.redis" level="info"/>
+
+        <!-- 根日志配置 -->
+        <root level="${log.root.level}">
+                <appender-ref ref="STDOUT"/>
+                <appender-ref ref="FILE"/>
+        </root>
+
+</configuration>
